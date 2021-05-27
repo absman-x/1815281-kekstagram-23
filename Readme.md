@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм»
 
 * Студент: [Sergey Karpov](https://up.htmlacademy.ru/javascript/23/user/1815281).
-* Наставник: [Сергей Глазков] (https://htmlacademy.ru/profile/id1194253).
+* Наставник: [Сергей Глазков](https://htmlacademy.ru/profile/id1194253).
 
 ---
 
