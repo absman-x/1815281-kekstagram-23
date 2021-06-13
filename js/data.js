@@ -1,4 +1,4 @@
-import {getRandomInteger} from './utils.js';
+import {getRandomInteger, getRandomElementFromArray} from './utils.js';
 
 const COUNT_MOCK_USERS = 25;
 const MAX_COMMENTS = 3;
@@ -6,10 +6,6 @@ const MESSAGE_VARIANTS = ['Всё отлично!', 'В целом всё неп
 const NAME_VARIANTS = ['Дмитрий', 'Анатолий', 'Рушат', 'Андрей', 'Ольга', 'Евгений', 'Наталья', 'Вячеслав', 'Альфия'];
 const DESCRIPTION_FIRST_PARTS = ['Просто ', 'Супер ', 'Это ', 'А вот '];
 const DESCRIPTION_SECOND_PARTS = ['фотка', 'фото', 'картинка', 'пикча'];
-
-function getRandomElementFromArray (array) {
-  return array[getRandomInteger(0, array.length - 1)];
-}
 
 function getUsers () {
   const totallyRandomArray = [];
