@@ -8,12 +8,12 @@ function getRandomInteger (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-//const validLength = 140;
-
 function validateLength(text, validLength) {
   return text.length <= validLength;
 }
 
-validateLength('тест', 140);
+function getRandomElementFromArray (array) {
+  return array[getRandomInteger(0, array.length - 1)];
+}
 
-export {getRandomInteger, validateLength};
+export {getRandomInteger, validateLength, getRandomElementFromArray};
