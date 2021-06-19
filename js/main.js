@@ -1,3 +1,4 @@
 import {getUsers} from './data.js';
+import {generateNewPictures} from './picture.js';
 
-getUsers();
+generateNewPictures(getUsers());

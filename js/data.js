@@ -7,19 +7,19 @@ const NAME_VARIANTS = ['Дмитрий', 'Анатолий', 'Рушат', 'Ан
 const DESCRIPTION_FIRST_PARTS = ['Просто ', 'Супер ', 'Это ', 'А вот '];
 const DESCRIPTION_SECOND_PARTS = ['фотка', 'фото', 'картинка', 'пикча'];
 
-function getUsers () {
+const getUsers = () => {
   const totallyRandomArray = [];
   const users = [];
-  function getUniqueRandomId(array) {
+  const getUniqueRandomId = (array) => {
     const randomId = getRandomInteger(1, COUNT_MOCK_USERS * MAX_COMMENTS);
     if (!totallyRandomArray.includes(randomId)) {
       totallyRandomArray.push(randomId);
       return randomId;
     }
     return getUniqueRandomId(array);
-  }
+  };
 
-  function getRandomComments() {
+  const getRandomComments = () => {
     const comments = [];
     const totalCommentsCount = getRandomInteger(1, 3);
     for (let i = 1; i <= totalCommentsCount; i++) {
@@ -32,7 +32,7 @@ function getUsers () {
       comments.push(comment);
     }
     return comments;
-  }
+  };
 
   for (let i = 1; i <= COUNT_MOCK_USERS; i++) {
     const currentUser = {
@@ -45,8 +45,6 @@ function getUsers () {
     users.push(currentUser);
   }
   return users;
-}
-
-getUsers();
+};
 
 export {getUsers};
