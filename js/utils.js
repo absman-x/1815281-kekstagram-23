@@ -12,4 +12,8 @@ const validateLength = (text, validLength) => text.length <= validLength;
 
 const getRandomElementFromArray = (array) => array[getRandomInteger(0, array.length - 1)];
 
-export {getRandomInteger, validateLength, getRandomElementFromArray};
+const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
+const isEnterEvent = (evt) => evt.key === 'Enter';
+
+export {getRandomInteger, validateLength, getRandomElementFromArray, isEscEvent, isEnterEvent};

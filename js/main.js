@@ -1,4 +1,7 @@
 import {getUsers} from './data.js';
-import {generateNewPictures} from './picture.js';
+import {renderPicturePreviews} from './picture.js';
+import {BigPictureSelector} from './bigpicture.js';
 
-generateNewPictures(getUsers());
+const picturesData = getUsers();
+renderPicturePreviews(picturesData);
+BigPictureSelector(picturesData);

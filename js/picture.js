@@ -13,10 +13,10 @@ const createPicturePreview = (picturePreview) => {
   return picture;
 };
 
-const generateNewPictures = (picturePreviews) => {
+const renderPicturePreviews = (picturePreviews) => {
   for (const picturePreview of picturePreviews) {
     picturesContainer.appendChild(createPicturePreview(picturePreview));
   }
 };
 
-export {generateNewPictures};
+export {renderPicturePreviews};
