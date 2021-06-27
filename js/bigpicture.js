@@ -1,5 +1,6 @@
 import {isEscEvent} from './utils.js';
 
+const AVATAR_SIZE = 35;
 const bigPicture = document.querySelector('.big-picture');
 const body = document.body;
 const picturesList = document.querySelector('.pictures');
@@ -12,7 +13,6 @@ const bigPictureDescription = bigPicture.querySelector('.social__caption');
 const bigPictureSocialCommentsCount = bigPicture.querySelector('.social__comment-count');
 const bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
 const commentsBlock = document.createDocumentFragment();
-const AVATAR_SIZE = 35;
 
 const bigPictureToggle = () => {
   bigPicture.classList.toggle('hidden');
@@ -21,11 +21,6 @@ const bigPictureToggle = () => {
   body.classList.toggle('modal-open');
 };
 
-function closeBigPicturePopup() {
-  removePopupListeners();
-  bigPictureToggle();
-}
-
 const escEvent = (evt) => {
   if (isEscEvent(evt)) {
     evt.preventDefault();
@@ -33,31 +28,32 @@ const escEvent = (evt) => {
   }
 };
 
-const removePopupListeners = () => {
+function closeBigPicturePopup() {
   document.removeEventListener('keydown', escEvent);
   bigPictureCloseElement.removeEventListener('click', closeBigPicturePopup);
-};
+  bigPictureToggle();
+}
 
-const commentElement = (element) => {
+const renderComment = (comment) => {
   const socialLiElement = document.createElement('li');
-  const socialParagraphElement = document.createElement('p');
-  const socialImgElement = document.createElement('img');
   socialLiElement.className = 'social__comment';
+  const socialParagraphElement = document.createElement('p');
+  socialParagraphElement.className = 'social__text';
+  socialParagraphElement.textContent = comment.message;
+  const socialImgElement = document.createElement('img');
   socialImgElement.className = 'social__picture';
-  socialImgElement.src = element.avatar;
-  socialImgElement.alt = element.name;
+  socialImgElement.src = comment.avatar;
+  socialImgElement.alt = comment.name;
   socialImgElement.width = AVATAR_SIZE;
   socialImgElement.height = AVATAR_SIZE;
-  socialParagraphElement.className = 'social__text';
-  socialParagraphElement.textContent = element.message;
   socialLiElement.appendChild(socialImgElement);
   socialLiElement.appendChild(socialParagraphElement);
   commentsBlock.appendChild(socialLiElement);
 };
 
-const bigPicturePreview = (picture) => {
+const renderBigPicturePreview = (picture) => {
   const comments = picture.comments;
-  comments.forEach((element) => commentElement(element));
+  comments.forEach((comment) => renderComment(comment));
   bigPictureImg.querySelector('img').src = picture.url;
   bigPictureLikes.textContent = picture.likes;
   bigPictureCommentsCount.textContent = picture.comments.length;
@@ -69,16 +65,16 @@ const bigPicturePreview = (picture) => {
   bigPictureCloseElement.addEventListener('click', closeBigPicturePopup);
 };
 
-const BigPictureSelector = (picturesData) => {
+const addOpenHandler = (picturesData) => {
   picturesList.addEventListener('click', (evt) => {
-    picturesData.find((element) => {
-      if (evt.target.matches('.picture__img')) {
-        if (element.url === evt.target.attributes.src.textContent) {
-          bigPicturePreview(element);
-        }
+    if (evt.target.classList.contains('picture__img')) {
+      const id = parseInt(evt.target.dataset.id, 10);
+      const pictureData = picturesData.find((it) => it.id === id);
+      if (pictureData) {
+        renderBigPicturePreview(pictureData);
       }
-    });
+    }
   });
 };
 
-export {BigPictureSelector};
+export {addOpenHandler};

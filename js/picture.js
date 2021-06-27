@@ -8,6 +8,7 @@ const createPicturePreview = (picturePreview) => {
   const pictureComments = picture.querySelector('.picture__comments');
   pictureImg.src = picturePreview.url;
   pictureImg.alt = picturePreview.description;
+  pictureImg.dataset.id = picturePreview.id;
   pictureComments.textContent = picturePreview.comments.length;
   pictureLikes.textContent = picturePreview.likes;
   return picture;
