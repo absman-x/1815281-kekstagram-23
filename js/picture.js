@@ -8,15 +8,16 @@ const createPicturePreview = (picturePreview) => {
   const pictureComments = picture.querySelector('.picture__comments');
   pictureImg.src = picturePreview.url;
   pictureImg.alt = picturePreview.description;
+  pictureImg.dataset.id = picturePreview.id;
   pictureComments.textContent = picturePreview.comments.length;
   pictureLikes.textContent = picturePreview.likes;
   return picture;
 };
 
-const generateNewPictures = (picturePreviews) => {
+const renderPicturePreviews = (picturePreviews) => {
   for (const picturePreview of picturePreviews) {
     picturesContainer.appendChild(createPicturePreview(picturePreview));
   }
 };
 
-export {generateNewPictures};
+export {renderPicturePreviews};
