@@ -30,8 +30,8 @@ const initImageUploader = () => {
     formCancelButton.removeEventListener('click', closeImageForm);
     document.removeEventListener('keydown', escEvent);
     fileChooser.value = '';
-    commentsTextInput.value = '';
     hashtagsTextInput.value = '';
+    commentsTextInput.value = '';
     formUploadToggle();
   }
 
