@@ -1,6 +1,7 @@
 import {isEscEvent} from './utils.js';
 
-const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+//const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 const MAX_COMMENT_SYMBOLS = 140;
 const body = document.body;
 const fileChooser = document.querySelector('.img-upload__input[type=file]');
@@ -10,6 +11,7 @@ const hashtagsTextInput= document.querySelector('.text__hashtags');
 const commentsTextInput = document.querySelector('.text__description');
 const imageUpload = document.querySelector('.img-upload__preview');
 const imageUploadPreview = imageUpload.querySelector('img');
+const imageStyle = document.querySelectorAll('.effects__preview');
 const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
 
 const formUploadToggle = () => {
@@ -34,6 +36,7 @@ function closeImageForm() {
 }
 
 if (fileChooser) {
+  fileChooser.setAttribute('accept', FILE_TYPES);
   fileChooser.addEventListener('change', () => {
     const file = fileChooser.files[0];
     if (fileChooser.files.length) {
@@ -44,14 +47,15 @@ if (fileChooser) {
         reader.addEventListener('load', () => {
           if (imageUploadPreview) {
             imageUploadPreview.src = reader.result;
+            imageStyle.forEach((it) => (it.style.backgroundImage = `url(${reader.result})`));
+            formUploadToggle();
+            formCancelButton.addEventListener('click', closeImageForm);
+            document.addEventListener('keydown', escEvent);
           }
         });
         reader.readAsDataURL(file);
       }
     }
-    formUploadToggle();
-    formCancelButton.addEventListener('click', closeImageForm);
-    document.addEventListener('keydown', escEvent);
   });
 }
 

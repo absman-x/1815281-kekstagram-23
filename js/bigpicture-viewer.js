@@ -20,19 +20,6 @@ const bigPictureToggle = () => {
   body.classList.toggle('modal-open');
 };
 
-const escEvent = (evt) => {
-  if (isEscEvent(evt)) {
-    evt.preventDefault();
-    closeBigPicturePopup();
-  }
-};
-
-function closeBigPicturePopup() {
-  document.removeEventListener('keydown', escEvent);
-  bigPictureCloseElement.removeEventListener('click', closeBigPicturePopup);
-  bigPictureToggle();
-}
-
 const renderComment = (comment) => {
   const socialLiElement = document.createElement('li');
   socialLiElement.className = 'social__comment';
@@ -51,6 +38,12 @@ const renderComment = (comment) => {
 };
 
 const renderBigPicturePreview = (picture) => {
+  const escEvent = (evt) => {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      closeBigPicturePopup();
+    }
+  };
   const comments = picture.comments.slice();
   const commentsLength = picture.comments.length;
   const renderCommentsBlock = () => {
@@ -64,7 +57,6 @@ const renderBigPicturePreview = (picture) => {
       bigPictureCommentsLoader.classList.add('hidden');
     } else {
       bigPictureCommentsLoader.classList.remove('hidden');
-      bigPictureCommentsLoader.addEventListener('click', renderCommentsBlock);
     }
   };
   bigPictureComments.innerHTML = '';
@@ -72,10 +64,24 @@ const renderBigPicturePreview = (picture) => {
   bigPictureLikes.textContent = picture.likes;
   bigPictureAllCommentsCount.textContent = commentsLength;
   bigPictureDescription.textContent = picture.description;
-  renderCommentsBlock();
+  bigPictureCommentsLoader.addEventListener('click', renderCommentsBlock);
+  bigPictureCommentsLoader.dispatchEvent(new Event('click'));
   bigPictureToggle();
   document.addEventListener('keydown', escEvent);
   bigPictureCloseElement.addEventListener('click', closeBigPicturePopup);
+  function closeBigPicturePopup() {
+    document.removeEventListener('keydown', escEvent);
+    bigPictureCloseElement.removeEventListener('click', closeBigPicturePopup);
+    bigPictureCommentsLoader.removeEventListener('click', renderCommentsBlock);
+    commentsBlock.innerHTML = '';
+    bigPictureCommentsCount.innerHTML = '';
+    bigPictureComments.innerHTML = '';
+    bigPictureImg.querySelector('img').src = '';
+    bigPictureLikes.textContent = '';
+    bigPictureAllCommentsCount.textContent = '';
+    bigPictureDescription.textContent = '';
+    bigPictureToggle();
+  }
 };
 
 const addOpenHandler = (picturesData) => {
