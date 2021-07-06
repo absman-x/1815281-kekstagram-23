@@ -1,6 +1,5 @@
 import {isEscEvent} from './utils.js';
 
-//const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 const MAX_COMMENT_SYMBOLS = 140;
 const body = document.body;
@@ -35,29 +34,32 @@ function closeImageForm() {
   formUploadToggle();
 }
 
-if (fileChooser) {
-  fileChooser.setAttribute('accept', FILE_TYPES);
-  fileChooser.addEventListener('change', () => {
-    const file = fileChooser.files[0];
-    if (fileChooser.files.length) {
-      const fileName = file.name.toLowerCase();
-      const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
-      if (matches) {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-          if (imageUploadPreview) {
-            imageUploadPreview.src = reader.result;
-            imageStyle.forEach((it) => (it.style.backgroundImage = `url(${reader.result})`));
-            formUploadToggle();
-            formCancelButton.addEventListener('click', closeImageForm);
-            document.addEventListener('keydown', escEvent);
-          }
-        });
-        reader.readAsDataURL(file);
+const newImageUploader = () => {
+  if (fileChooser) {
+    fileChooser.setAttribute('accept', FILE_TYPES);
+    fileChooser.addEventListener('change', () => {
+      const file = fileChooser.files[0];
+      if (fileChooser.files.length) {
+        const fileName = file.name.toLowerCase();
+        const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+        if (matches) {
+          const reader = new FileReader();
+          reader.addEventListener('load', () => {
+            if (imageUploadPreview) {
+              imageUploadPreview.src = reader.result;
+              imageStyle.forEach((it) => (it.style.backgroundImage = `url(${reader.result})`));
+              formUploadToggle();
+              formCancelButton.addEventListener('click', closeImageForm);
+              document.addEventListener('keydown', escEvent);
+            }
+          });
+          reader.readAsDataURL(file);
+        }
       }
-    }
-  });
-}
+    });
+  }
+};
+
 
 commentsTextInput.addEventListener('input', () => {
   const valueLength = commentsTextInput.value.length;
@@ -89,3 +91,5 @@ hashtagsTextInput.addEventListener('input', () => {
     }
   }
 });
+
+export {newImageUploader};
