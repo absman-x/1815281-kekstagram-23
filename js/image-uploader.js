@@ -2,6 +2,13 @@ import {isEscEvent} from './utils.js';
 
 const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 const MAX_COMMENT_SYMBOLS = 140;
+const FILTERS = {
+  CHROME: 'chrome',
+  SEPIA: 'sepia',
+  MARVIN: 'marvin',
+  PHOBOS: 'phobos',
+  HEAT: 'heat',
+};
 const body = document.body;
 const fileChooser = document.querySelector('.img-upload__input[type=file]');
 const imageUploadForm = document.querySelector('.img-upload__overlay');
@@ -21,7 +28,7 @@ const imageStyle = document.querySelectorAll('.effects__preview');
 const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
 
 const chromeEffect = {
-  name: 'chrome',
+  name: FILTERS.CHROME,
   filterType: 'grayscale',
   minValue: 0,
   maxValue: 1,
@@ -30,7 +37,7 @@ const chromeEffect = {
 };
 
 const sepiaEffect = {
-  name: 'sepia',
+  name: FILTERS.SEPIA,
   filterType: 'sepia',
   minValue: 0,
   maxValue: 1,
@@ -39,7 +46,7 @@ const sepiaEffect = {
 };
 
 const marvinEffect = {
-  name: 'marvin',
+  name: FILTERS.MARVIN,
   filterType: 'invert',
   minValue: 0,
   maxValue: 100,
@@ -48,7 +55,7 @@ const marvinEffect = {
 };
 
 const phobosEffect = {
-  name: 'phobos',
+  name: FILTERS.PHOBOS,
   filterType: 'blur',
   minValue: 0,
   maxValue: 3,
@@ -57,7 +64,7 @@ const phobosEffect = {
 };
 
 const heatEffect = {
-  name: 'heat',
+  name: FILTERS.HEAT,
   filterType: 'brightness',
   minValue: 1,
   maxValue: 3,
@@ -80,7 +87,7 @@ const initImageUploader = () => {
     }
   };
 
-  const imageTransform = (scaleData) => {
+  const setScale = (scaleData) => {
     imageUpload.style.transform = `scale(${scaleData / 100})`;
     scaleTextValue.value = `${scaleData}%`;
   };
@@ -88,18 +95,19 @@ const initImageUploader = () => {
   const scaleBigger = () => {
     if (imageScaleValue < 100) {
       imageScaleValue += 25;
-      imageTransform(imageScaleValue);
+      setScale(imageScaleValue);
     }
   };
 
   const scaleSmaller = () => {
     if (imageScaleValue > 25) {
       imageScaleValue -= 25;
-      imageTransform(imageScaleValue);
+      setScale(imageScaleValue);
     }
   };
 
   const applyFilter = (effect) => {
+    clearFilter();
     effectsForm.classList.remove('hidden');
     imageUpload.classList.add(`effects__preview--${effect.name}`);
     effectsSlider.noUiSlider.updateOptions({
@@ -133,8 +141,11 @@ const initImageUploader = () => {
   }
 
   function clearFilter() {
-    const regx = new RegExp('\\beffects__preview--[^ ]*[ ]?\\b', 'g');
-    imageUpload.className = imageUpload.className.replace(regx, '');
+    for (const className of imageUpload.classList) {
+      if (className.startsWith('effects__preview--')) {
+        imageUpload.classList.remove(className);
+      }
+    }
     imageUpload.style.filter = '';
   }
 
@@ -192,25 +203,31 @@ const initImageUploader = () => {
   effectsButtons.addEventListener('click', (evt) => {
     const clickedEffect = evt.target.value;
     if (evt.target.matches('input[type="radio"]') && clickedEffect !== selectedEffect) {
-      if (clickedEffect === 'chrome') {
-        applyFilter(chromeEffect);
-        selectedEffect = 'chrome';
-      } else if (clickedEffect === 'sepia') {
-        applyFilter(sepiaEffect);
-        selectedEffect = 'sepia';
-      } else if (clickedEffect === 'marvin') {
-        applyFilter(marvinEffect);
-        selectedEffect = 'marvin';
-      } else if (clickedEffect === 'phobos') {
-        applyFilter(phobosEffect);
-        selectedEffect = 'phobos';
-      } else if (clickedEffect === 'heat') {
-        applyFilter(heatEffect);
-        selectedEffect = 'heat';
-      } else {
-        effectsForm.classList.add('hidden');
-        selectedEffect = 'none';
-        clearFilter();
+      switch (clickedEffect) {
+        case (FILTERS.CHROME):
+          applyFilter(chromeEffect);
+          selectedEffect = clickedEffect;
+          break;
+        case (FILTERS.SEPIA):
+          applyFilter(sepiaEffect);
+          selectedEffect = clickedEffect;
+          break;
+        case (FILTERS.MARVIN):
+          applyFilter(marvinEffect);
+          selectedEffect = clickedEffect;
+          break;
+        case (FILTERS.PHOBOS):
+          applyFilter(phobosEffect);
+          selectedEffect = clickedEffect;
+          break;
+        case (FILTERS.HEAT):
+          applyFilter(heatEffect);
+          selectedEffect = clickedEffect;
+          break;
+        default:
+          effectsForm.classList.add('hidden');
+          selectedEffect = 'none';
+          clearFilter();
       }
     }
   });
