@@ -1,4 +1,5 @@
-import {isEscEvent} from './utils.js';
+import {showAlert, isEscEvent} from './utils.js';
+import {sendData} from './server-api.js';
 
 const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 const MAX_COMMENT_SYMBOLS = 140;
@@ -10,8 +11,9 @@ const FILTERS = {
   HEAT: 'heat',
 };
 const body = document.body;
+const imageUploadForm = document.querySelector('.img-upload__form');
 const fileChooser = document.querySelector('.img-upload__input[type=file]');
-const imageUploadForm = document.querySelector('.img-upload__overlay');
+const imageUploadOverlay = imageUploadForm.querySelector('.img-upload__overlay');
 const formCancelButton = document.querySelector('.img-upload__cancel');
 const scaleSmallerButton = document.querySelector('.scale__control--smaller');
 const scaleBiggerButton = document.querySelector('.scale__control--bigger');
@@ -26,6 +28,11 @@ const imageUpload = document.querySelector('.img-upload__preview');
 const imageUploadPreview = imageUpload.querySelector('img');
 const imageStyle = document.querySelectorAll('.effects__preview');
 const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
+const loadTemplate = document.querySelector('#messages').content;
+const errorTemplate = document.querySelector('#error').content;
+const errorButton = errorTemplate.querySelector('.error__button');
+const successTemplate = document.querySelector('#success').content;
+const successButton = successTemplate.querySelector('.success__button');
 
 const chromeEffect = {
   name: FILTERS.CHROME,
@@ -74,7 +81,7 @@ const heatEffect = {
 
 const initImageUploader = () => {
   const formUploadToggle = () => {
-    imageUploadForm.classList.toggle('hidden');
+    imageUploadOverlay.classList.toggle('hidden');
     body.classList.toggle('modal-open');
   };
 
@@ -130,6 +137,8 @@ const initImageUploader = () => {
     formCancelButton.removeEventListener('click', closeImageForm);
     document.removeEventListener('keydown', escEvent);
     fileChooser.value = '';
+    imageUploadForm.reset();
+    effectsValue.value = '';
     hashtagsTextInput.value = '';
     commentsTextInput.value = '';
     imageUpload.classList.remove('scale');
@@ -138,6 +147,7 @@ const initImageUploader = () => {
     effectsSlider.noUiSlider.destroy();
     clearFilter();
     formUploadToggle();
+    console.log('form closed');
   }
 
   function clearFilter() {
@@ -169,6 +179,7 @@ const initImageUploader = () => {
               formCancelButton.addEventListener('click', closeImageForm);
               document.addEventListener('keydown', escEvent);
               effectsForm.classList.add('hidden');
+
               noUiSlider.create(effectsSlider, {
                 step: 1,
                 range: {
@@ -189,6 +200,7 @@ const initImageUploader = () => {
                   },
                 },
               });
+
               scaleSmallerButton.addEventListener('click', scaleSmaller);
               scaleBiggerButton.addEventListener('click', scaleBigger);
             }
@@ -196,6 +208,38 @@ const initImageUploader = () => {
           reader.readAsDataURL(file);
         }
       }
+    });
+  }
+
+  function messageFormRemove () {
+    console.log('form remover');
+    document.body.lastElementChild.remove();
+    errorButton.removeEventListener('click', messageFormRemove);
+    successButton.removeEventListener('click', messageFormRemove);
+  }
+
+  const successPopup = () => {
+    document.body.lastElementChild.remove();
+    document.body.append(successTemplate);
+    successButton.addEventListener('click', messageFormRemove);
+  };
+
+  const errorPopup = () => {
+    document.body.lastElementChild.remove();
+    document.body.append(errorTemplate);
+    errorButton.addEventListener('click', messageFormRemove);
+  };
+
+  if (imageUploadForm) {
+    imageUploadForm.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      document.body.append(loadTemplate);
+      sendData(
+        () => successPopup(),
+        () => errorPopup(),
+        new FormData(evt.target),
+      );
+      closeImageForm();
     });
   }
 
