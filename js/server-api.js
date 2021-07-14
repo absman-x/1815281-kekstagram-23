@@ -1,13 +1,24 @@
+import {showAlert} from './utils.js';
+
 const Url = {
   SERVER: 'https://23.javascript.pages.academy/kekstagram',
   DATA: 'https://23.javascript.pages.academy/kekstagram/data',
 };
 
-const getData = (onSuccess) => {
+const getData = (onSuccess, onFail) => {
   fetch(Url.DATA)
-    .then((response) => response.json())
-    .then((picturesData) => {
-      onSuccess(picturesData);
+    .then((response) => {
+      if (response.ok) {
+        response.json()
+          .then((picturesData) => {
+            onSuccess(picturesData);
+          });
+      } else {
+        onFail();
+      }
+    })
+    .catch(() => {
+      showAlert('Не удалось загрузить данные, повторите попытку позже');
     });
 };
 
@@ -21,16 +32,13 @@ const sendData = (onSuccess, onFail, body) => {
   )
     .then((response) => {
       if (response.ok) {
-        console.log('success!');
         onSuccess();
       } else {
         onFail('Не удалось отправить форму. Попробуйте ещё раз');
-        console.log(response);
       }
     })
-    .catch((e) => {
+    .catch(() => {
       onFail('Не удалось отправить форму. Попробуйте ещё раз');
-      console.log(e);
     });
 };
 

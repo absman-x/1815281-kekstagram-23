@@ -1,4 +1,4 @@
-import {showAlert, isEscEvent} from './utils.js';
+import {isEscEvent} from './utils.js';
 import {sendData} from './server-api.js';
 
 const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
@@ -30,9 +30,8 @@ const imageStyle = document.querySelectorAll('.effects__preview');
 const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
 const loadTemplate = document.querySelector('#messages').content;
 const errorTemplate = document.querySelector('#error').content;
-const errorButton = errorTemplate.querySelector('.error__button');
 const successTemplate = document.querySelector('#success').content;
-const successButton = successTemplate.querySelector('.success__button');
+//const successButton = successTemplate.querySelector('.success__button');
 
 const chromeEffect = {
   name: FILTERS.CHROME,
@@ -147,7 +146,6 @@ const initImageUploader = () => {
     effectsSlider.noUiSlider.destroy();
     clearFilter();
     formUploadToggle();
-    console.log('form closed');
   }
 
   function clearFilter() {
@@ -212,28 +210,44 @@ const initImageUploader = () => {
   }
 
   function messageFormRemove () {
-    console.log('form remover');
     document.body.lastElementChild.remove();
-    errorButton.removeEventListener('click', messageFormRemove);
-    successButton.removeEventListener('click', messageFormRemove);
+    document.removeEventListener('keydown', listnerHandler);
+    document.removeEventListener('click', listnerHandler);
+  }
+
+  function listnerHandler (evt) {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      messageFormRemove();
+    } else if (evt.target === document.body.lastElementChild) {
+      evt.preventDefault();
+      messageFormRemove();
+    }
   }
 
   const successPopup = () => {
     document.body.lastElementChild.remove();
-    document.body.append(successTemplate);
+    const successPopupBlock = successTemplate.cloneNode(true);
+    document.body.append(successPopupBlock);
+    const successButton = document.querySelector('.success__button');
     successButton.addEventListener('click', messageFormRemove);
+    document.addEventListener('click', listnerHandler);
+    document.addEventListener('keydown', listnerHandler);
   };
 
   const errorPopup = () => {
     document.body.lastElementChild.remove();
-    document.body.append(errorTemplate);
+    document.body.append(errorTemplate.cloneNode(true));
+    const errorButton = document.querySelector('.error__button');
     errorButton.addEventListener('click', messageFormRemove);
+    document.addEventListener('click', listnerHandler);
+    document.addEventListener('keydown', listnerHandler);
   };
 
   if (imageUploadForm) {
     imageUploadForm.addEventListener('submit', (evt) => {
       evt.preventDefault();
-      document.body.append(loadTemplate);
+      document.body.append(loadTemplate.cloneNode(true));
       sendData(
         () => successPopup(),
         () => errorPopup(),
