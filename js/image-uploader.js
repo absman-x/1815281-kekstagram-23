@@ -1,4 +1,5 @@
 import {isEscEvent} from './utils.js';
+import {sendData} from './server-api.js';
 
 const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 const MAX_COMMENT_SYMBOLS = 140;
@@ -10,8 +11,9 @@ const FILTERS = {
   HEAT: 'heat',
 };
 const body = document.body;
+const imageUploadForm = document.querySelector('.img-upload__form');
 const fileChooser = document.querySelector('.img-upload__input[type=file]');
-const imageUploadForm = document.querySelector('.img-upload__overlay');
+const imageUploadOverlay = imageUploadForm.querySelector('.img-upload__overlay');
 const formCancelButton = document.querySelector('.img-upload__cancel');
 const scaleSmallerButton = document.querySelector('.scale__control--smaller');
 const scaleBiggerButton = document.querySelector('.scale__control--bigger');
@@ -26,6 +28,10 @@ const imageUpload = document.querySelector('.img-upload__preview');
 const imageUploadPreview = imageUpload.querySelector('img');
 const imageStyle = document.querySelectorAll('.effects__preview');
 const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
+const loadTemplate = document.querySelector('#messages').content;
+const errorTemplate = document.querySelector('#error').content;
+const successTemplate = document.querySelector('#success').content;
+//const successButton = successTemplate.querySelector('.success__button');
 
 const chromeEffect = {
   name: FILTERS.CHROME,
@@ -74,7 +80,7 @@ const heatEffect = {
 
 const initImageUploader = () => {
   const formUploadToggle = () => {
-    imageUploadForm.classList.toggle('hidden');
+    imageUploadOverlay.classList.toggle('hidden');
     body.classList.toggle('modal-open');
   };
 
@@ -130,6 +136,8 @@ const initImageUploader = () => {
     formCancelButton.removeEventListener('click', closeImageForm);
     document.removeEventListener('keydown', escEvent);
     fileChooser.value = '';
+    imageUploadForm.reset();
+    effectsValue.value = '';
     hashtagsTextInput.value = '';
     commentsTextInput.value = '';
     imageUpload.classList.remove('scale');
@@ -169,6 +177,7 @@ const initImageUploader = () => {
               formCancelButton.addEventListener('click', closeImageForm);
               document.addEventListener('keydown', escEvent);
               effectsForm.classList.add('hidden');
+
               noUiSlider.create(effectsSlider, {
                 step: 1,
                 range: {
@@ -189,6 +198,7 @@ const initImageUploader = () => {
                   },
                 },
               });
+
               scaleSmallerButton.addEventListener('click', scaleSmaller);
               scaleBiggerButton.addEventListener('click', scaleBigger);
             }
@@ -196,6 +206,54 @@ const initImageUploader = () => {
           reader.readAsDataURL(file);
         }
       }
+    });
+  }
+
+  function removeFormMessage () {
+    document.body.lastElementChild.remove();
+    document.removeEventListener('keydown', closeFormMessageHanlder);
+    document.removeEventListener('click', closeFormMessageHanlder);
+  }
+
+  function closeFormMessageHanlder (evt) {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      removeFormMessage();
+    } else if (evt.target === document.body.lastElementChild) {
+      evt.preventDefault();
+      removeFormMessage();
+    }
+  }
+
+  const showSuccessPopup = () => {
+    document.body.lastElementChild.remove();
+    const successPopupBlock = successTemplate.cloneNode(true);
+    document.body.append(successPopupBlock);
+    const successButton = document.querySelector('.success__button');
+    successButton.addEventListener('click', removeFormMessage);
+    document.addEventListener('click', closeFormMessageHanlder);
+    document.addEventListener('keydown', closeFormMessageHanlder);
+  };
+
+  const showErrorPopup = () => {
+    document.body.lastElementChild.remove();
+    document.body.append(errorTemplate.cloneNode(true));
+    const errorButton = document.querySelector('.error__button');
+    errorButton.addEventListener('click', removeFormMessage);
+    document.addEventListener('click', closeFormMessageHanlder);
+    document.addEventListener('keydown', closeFormMessageHanlder);
+  };
+
+  if (imageUploadForm) {
+    imageUploadForm.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      document.body.append(loadTemplate.cloneNode(true));
+      sendData(
+        () => showSuccessPopup(),
+        () => showErrorPopup(),
+        new FormData(evt.target),
+      );
+      closeImageForm();
     });
   }
 

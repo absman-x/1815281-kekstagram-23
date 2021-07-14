@@ -1,9 +1,10 @@
-import {getUsers} from './data.js';
 import {renderPicturePreviews} from './picture.js';
 import {addOpenHandler} from './bigpicture-viewer.js';
 import {initImageUploader} from './image-uploader.js';
+import {getData} from './server-api.js';
 
-const picturesData = getUsers();
-renderPicturePreviews(picturesData);
-addOpenHandler(picturesData);
+getData((picturesData) => {
+  renderPicturePreviews(picturesData);
+  addOpenHandler(picturesData);
+});
 initImageUploader();
