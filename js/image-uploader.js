@@ -209,39 +209,39 @@ const initImageUploader = () => {
     });
   }
 
-  function messageFormRemove () {
+  function removeFormMessage () {
     document.body.lastElementChild.remove();
-    document.removeEventListener('keydown', listnerHandler);
-    document.removeEventListener('click', listnerHandler);
+    document.removeEventListener('keydown', closeFormMessageHanlder);
+    document.removeEventListener('click', closeFormMessageHanlder);
   }
 
-  function listnerHandler (evt) {
+  function closeFormMessageHanlder (evt) {
     if (isEscEvent(evt)) {
       evt.preventDefault();
-      messageFormRemove();
+      removeFormMessage();
     } else if (evt.target === document.body.lastElementChild) {
       evt.preventDefault();
-      messageFormRemove();
+      removeFormMessage();
     }
   }
 
-  const successPopup = () => {
+  const showSuccessPopup = () => {
     document.body.lastElementChild.remove();
     const successPopupBlock = successTemplate.cloneNode(true);
     document.body.append(successPopupBlock);
     const successButton = document.querySelector('.success__button');
-    successButton.addEventListener('click', messageFormRemove);
-    document.addEventListener('click', listnerHandler);
-    document.addEventListener('keydown', listnerHandler);
+    successButton.addEventListener('click', removeFormMessage);
+    document.addEventListener('click', closeFormMessageHanlder);
+    document.addEventListener('keydown', closeFormMessageHanlder);
   };
 
-  const errorPopup = () => {
+  const showErrorPopup = () => {
     document.body.lastElementChild.remove();
     document.body.append(errorTemplate.cloneNode(true));
     const errorButton = document.querySelector('.error__button');
-    errorButton.addEventListener('click', messageFormRemove);
-    document.addEventListener('click', listnerHandler);
-    document.addEventListener('keydown', listnerHandler);
+    errorButton.addEventListener('click', removeFormMessage);
+    document.addEventListener('click', closeFormMessageHanlder);
+    document.addEventListener('keydown', closeFormMessageHanlder);
   };
 
   if (imageUploadForm) {
@@ -249,8 +249,8 @@ const initImageUploader = () => {
       evt.preventDefault();
       document.body.append(loadTemplate.cloneNode(true));
       sendData(
-        () => successPopup(),
-        () => errorPopup(),
+        () => showSuccessPopup(),
+        () => showErrorPopup(),
         new FormData(evt.target),
       );
       closeImageForm();
