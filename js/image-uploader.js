@@ -24,14 +24,13 @@ const effectsButtons = document.querySelector('.img-upload__effects');
 const effectsValue = effectsForm.querySelector('.effect-level__value');
 const hashtagsTextInput= document.querySelector('.text__hashtags');
 const commentsTextInput = document.querySelector('.text__description');
-const imageUpload = document.querySelector('.img-upload__preview');
-const imageUploadPreview = imageUpload.querySelector('img');
+const imageUploadPreview = document.querySelector('.img-upload__preview');
+const imageUpload = imageUploadPreview.querySelector('img');
 const imageStyle = document.querySelectorAll('.effects__preview');
 const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
 const loadTemplate = document.querySelector('#messages').content;
 const errorTemplate = document.querySelector('#error').content;
 const successTemplate = document.querySelector('#success').content;
-//const successButton = successTemplate.querySelector('.success__button');
 
 const chromeEffect = {
   name: FILTERS.CHROME,
@@ -94,7 +93,7 @@ const initImageUploader = () => {
   };
 
   const setScale = (scaleData) => {
-    imageUpload.style.transform = `scale(${scaleData / 100})`;
+    imageUploadPreview.style.transform = `scale(${scaleData / 100})`;
     scaleTextValue.value = `${scaleData}%`;
   };
 
@@ -115,7 +114,7 @@ const initImageUploader = () => {
   const applyFilter = (effect) => {
     clearFilter();
     effectsForm.classList.remove('hidden');
-    imageUpload.classList.add(`effects__preview--${effect.name}`);
+    imageUploadPreview.classList.add(`effects__preview--${effect.name}`);
     effectsSlider.noUiSlider.updateOptions({
       range: {
         min: effect.minValue,
@@ -127,7 +126,7 @@ const initImageUploader = () => {
     effectsSlider.noUiSlider.on('update', (values, handle) => {
       const filterValue = values[handle];
       effectsValue.value = filterValue;
-      imageUpload.style.filter = `${effect.filterType}(${filterValue}${effect.valueType})`;
+      imageUploadPreview.style.filter = `${effect.filterType}(${filterValue}${effect.valueType})`;
     });
   };
 
@@ -140,7 +139,7 @@ const initImageUploader = () => {
     effectsValue.value = '';
     hashtagsTextInput.value = '';
     commentsTextInput.value = '';
-    imageUpload.classList.remove('scale');
+    imageUploadPreview.classList.remove('scale');
     scaleSmallerButton.removeEventListener('click', scaleSmaller);
     scaleBiggerButton.removeEventListener('click', scaleBigger);
     effectsSlider.noUiSlider.destroy();
@@ -149,12 +148,12 @@ const initImageUploader = () => {
   }
 
   function clearFilter() {
-    for (const className of imageUpload.classList) {
+    for (const className of imageUploadPreview.classList) {
       if (className.startsWith('effects__preview--')) {
-        imageUpload.classList.remove(className);
+        imageUploadPreview.classList.remove(className);
       }
     }
-    imageUpload.style.filter = '';
+    imageUploadPreview.style.filter = '';
   }
 
   if (fileChooser) {
@@ -167,11 +166,11 @@ const initImageUploader = () => {
         if (matches) {
           const reader = new FileReader();
           reader.addEventListener('load', () => {
-            if (imageUploadPreview) {
-              imageUploadPreview.src = reader.result;
+            if (imageUpload) {
+              imageUpload.src = reader.result;
               imageStyle.forEach((it) => (it.style.backgroundImage = `url(${reader.result})`));
-              imageUpload.classList.add('scale');
-              imageUpload.style.transform = `scale(${imageScaleValue / 100})`;
+              imageUploadPreview.classList.add('scale');
+              imageUploadPreview.style.transform = `scale(${imageScaleValue / 100})`;
               formUploadToggle();
               scaleTextValue.value = `${imageScaleValue}%`;
               formCancelButton.addEventListener('click', closeImageForm);
@@ -206,54 +205,6 @@ const initImageUploader = () => {
           reader.readAsDataURL(file);
         }
       }
-    });
-  }
-
-  function removeFormMessage () {
-    document.body.lastElementChild.remove();
-    document.removeEventListener('keydown', closeFormMessageHanlder);
-    document.removeEventListener('click', closeFormMessageHanlder);
-  }
-
-  function closeFormMessageHanlder (evt) {
-    if (isEscEvent(evt)) {
-      evt.preventDefault();
-      removeFormMessage();
-    } else if (evt.target === document.body.lastElementChild) {
-      evt.preventDefault();
-      removeFormMessage();
-    }
-  }
-
-  const showSuccessPopup = () => {
-    document.body.lastElementChild.remove();
-    const successPopupBlock = successTemplate.cloneNode(true);
-    document.body.append(successPopupBlock);
-    const successButton = document.querySelector('.success__button');
-    successButton.addEventListener('click', removeFormMessage);
-    document.addEventListener('click', closeFormMessageHanlder);
-    document.addEventListener('keydown', closeFormMessageHanlder);
-  };
-
-  const showErrorPopup = () => {
-    document.body.lastElementChild.remove();
-    document.body.append(errorTemplate.cloneNode(true));
-    const errorButton = document.querySelector('.error__button');
-    errorButton.addEventListener('click', removeFormMessage);
-    document.addEventListener('click', closeFormMessageHanlder);
-    document.addEventListener('keydown', closeFormMessageHanlder);
-  };
-
-  if (imageUploadForm) {
-    imageUploadForm.addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      document.body.append(loadTemplate.cloneNode(true));
-      sendData(
-        () => showSuccessPopup(),
-        () => showErrorPopup(),
-        new FormData(evt.target),
-      );
-      closeImageForm();
     });
   }
 
@@ -320,6 +271,54 @@ const initImageUploader = () => {
       }
     }
   });
+
+  const closeFormMessageHanlder = (evt) => {
+    if (isEscEvent(evt)) {
+      evt.preventDefault();
+      removeFormMessage();
+    } else if (evt.target === document.body.lastElementChild) {
+      evt.preventDefault();
+      removeFormMessage();
+    }
+  };
+
+  function removeFormMessage() {
+    document.body.lastElementChild.remove();
+    document.removeEventListener('keydown', closeFormMessageHanlder);
+    document.removeEventListener('click', closeFormMessageHanlder);
+  }
+
+  const showSuccessPopup = () => {
+    document.body.lastElementChild.remove();
+    const successPopupBlock = successTemplate.cloneNode(true);
+    document.body.append(successPopupBlock);
+    const successButton = document.querySelector('.success__button');
+    successButton.addEventListener('click', removeFormMessage);
+    document.addEventListener('click', closeFormMessageHanlder);
+    document.addEventListener('keydown', closeFormMessageHanlder);
+  };
+
+  const showErrorPopup = () => {
+    document.body.lastElementChild.remove();
+    document.body.append(errorTemplate.cloneNode(true));
+    const errorButton = document.querySelector('.error__button');
+    errorButton.addEventListener('click', removeFormMessage);
+    document.addEventListener('click', closeFormMessageHanlder);
+    document.addEventListener('keydown', closeFormMessageHanlder);
+  };
+
+  if (imageUploadForm) {
+    imageUploadForm.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      document.body.append(loadTemplate.cloneNode(true));
+      sendData(
+        () => showSuccessPopup(),
+        () => showErrorPopup(),
+        new FormData(evt.target),
+      );
+      closeImageForm();
+    });
+  }
 };
 
 export {initImageUploader};
