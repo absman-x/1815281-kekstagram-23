@@ -7,13 +7,8 @@ const getRandomInteger = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-const validateLength = (text, validLength) => text.length <= validLength;
-
-const getRandomElementFromArray = (array) => array[getRandomInteger(0, array.length - 1)];
 
 const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
-
-const isEnterEvent = (evt) => evt.key === 'Enter';
 
 const showAlert = (message) => {
   const alertContainer = document.createElement('div');
@@ -36,4 +31,25 @@ const showAlert = (message) => {
   }, ALERT_SHOW_TIME);
 };
 
-export { getRandomInteger, validateLength, getRandomElementFromArray, isEscEvent, isEnterEvent, showAlert};
+// Функция взята из интернета и доработана
+// Источник - https://www.freecodecamp.org/news/javascript-debounce-example
+
+function debounce(callback, timeoutDelay = 500) {
+  // Используем замыкания, чтобы id таймаута у нас навсегда приклеился
+  // к возвращаемой функции с setTimeout, тогда мы его сможем перезаписывать
+  let timeoutId;
+
+  return (...rest) => {
+    // Перед каждым новым вызовом удаляем предыдущий таймаут,
+    // чтобы они не накапливались
+    clearTimeout(timeoutId);
+
+    // Затем устанавливаем новый таймаут с вызовом колбэка на ту же задержку
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+
+    // Таким образом цикл "поставить таймаут - удалить таймаут" будет выполняться,
+    // пока действие совершается чаще, чем переданная задержка timeoutDelay
+  };
+}
+
+export {debounce, getRandomInteger, isEscEvent, showAlert};
