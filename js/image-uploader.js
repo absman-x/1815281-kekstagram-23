@@ -27,10 +27,10 @@ const commentsTextInput = document.querySelector('.text__description');
 const imageUploadPreview = document.querySelector('.img-upload__preview');
 const imageUpload = imageUploadPreview.querySelector('img');
 const imageStyle = document.querySelectorAll('.effects__preview');
-const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
 const loadTemplate = document.querySelector('#messages').content;
 const errorTemplate = document.querySelector('#error').content;
 const successTemplate = document.querySelector('#success').content;
+const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
 
 const chromeEffect = {
   name: FILTERS.CHROME,
