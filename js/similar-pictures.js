@@ -1,6 +1,5 @@
 import {renderPicturePreviews} from './picture.js';
-import {getRandomInteger} from './utils.js';
-import {debounce} from './utils/debounce.js';
+import {debounce, getRandomInteger} from './utils.js';
 
 const FILTERS = {
   DEFAULT: 'filter-default',
