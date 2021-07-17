@@ -7,7 +7,7 @@ const getRandomInteger = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-const isEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+const checkEscEvent = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
 const showAlert = (message) => {
   const alertContainer = document.createElement('div');
@@ -51,4 +51,4 @@ function debounce(callback, timeoutDelay = 500) {
   };
 }
 
-export {debounce, getRandomInteger, isEscEvent, showAlert};
+export {debounce, getRandomInteger, checkEscEvent, showAlert};

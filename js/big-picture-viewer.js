@@ -1,4 +1,4 @@
-import {isEscEvent} from './utils.js';
+import {checkEscEvent} from './utils.js';
 
 const AVATAR_SIZE = 35;
 const COMMENTS_COUNT = 5;
@@ -39,21 +39,21 @@ const renderComment = (comment) => {
 
 const renderBigPicturePreview = (picture) => {
   const escEvent = (evt) => {
-    if (isEscEvent(evt)) {
+    if (checkEscEvent(evt)) {
       evt.preventDefault();
-      closeBigPicturePopup();
+      closeBigPicturePopupHandler();
     }
   };
   const comments = picture.comments.slice();
   const commentsLength = picture.comments.length;
-  const renderCommentsBlock = () => {
+  const renderCommentsBlockHandler = () => {
     const forRenderComments = comments.splice(0, COMMENTS_COUNT);
     forRenderComments.forEach((comment) => renderComment(comment));
     bigPictureComments.appendChild(commentsBlock);
     const shownCommentsCount = (bigPictureComments.querySelectorAll('.social__comment').length);
     bigPictureCommentsCount.innerHTML = `${shownCommentsCount} из <span class="comments-count">${commentsLength}</span> комментариев`;
     if (comments.length === 0) {
-      bigPictureCommentsLoader.removeEventListener('click', renderCommentsBlock);
+      bigPictureCommentsLoader.removeEventListener('click', renderCommentsBlockHandler);
       bigPictureCommentsLoader.classList.add('hidden');
     } else {
       bigPictureCommentsLoader.classList.remove('hidden');
@@ -64,15 +64,16 @@ const renderBigPicturePreview = (picture) => {
   bigPictureLikes.textContent = picture.likes;
   bigPictureAllCommentsCount.textContent = commentsLength;
   bigPictureDescription.textContent = picture.description;
-  bigPictureCommentsLoader.addEventListener('click', renderCommentsBlock);
+  bigPictureCommentsLoader.addEventListener('click', renderCommentsBlockHandler);
   bigPictureCommentsLoader.dispatchEvent(new Event('click'));
   bigPictureToggle();
   document.addEventListener('keydown', escEvent);
-  bigPictureCloseElement.addEventListener('click', closeBigPicturePopup);
-  function closeBigPicturePopup() {
+  bigPictureCloseElement.addEventListener('click', closeBigPicturePopupHandler);
+
+  function closeBigPicturePopupHandler() {
     document.removeEventListener('keydown', escEvent);
-    bigPictureCloseElement.removeEventListener('click', closeBigPicturePopup);
-    bigPictureCommentsLoader.removeEventListener('click', renderCommentsBlock);
+    bigPictureCloseElement.removeEventListener('click', closeBigPicturePopupHandler);
+    bigPictureCommentsLoader.removeEventListener('click', renderCommentsBlockHandler);
     commentsBlock.innerHTML = '';
     bigPictureCommentsCount.innerHTML = '';
     bigPictureComments.innerHTML = '';

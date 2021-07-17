@@ -1,8 +1,9 @@
-import {isEscEvent} from './utils.js';
+import {checkEscEvent} from './utils.js';
 import {sendData} from './server-api.js';
 
 const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 const MAX_COMMENT_SYMBOLS = 140;
+const MAX_HASHTAGS_COUNT = 5;
 const FILTERS = {
   CHROME: 'chrome',
   SEPIA: 'sepia',
@@ -31,6 +32,8 @@ const loadTemplate = document.querySelector('#messages').content;
 const errorTemplate = document.querySelector('#error').content;
 const successTemplate = document.querySelector('#success').content;
 const hashtagsPattern = /^#[A-za-zА-Яа-я0-9]{1,19}$/;
+
+let selectedEffect = '';
 
 const chromeEffect = {
   name: FILTERS.CHROME,
@@ -85,26 +88,28 @@ const initImageUploader = () => {
 
   let imageScaleValue = 100;
 
-  const escEvent = (evt) => {
-    if ((isEscEvent) && ((evt.target.nodeName === 'BODY') || (evt.target.matches('input[type="radio"]')) || (evt.target.matches('input[type="file"]')))) {
-      evt.preventDefault();
-      closeImageForm();
+  const escEventHandler = (evt) => {
+    if (checkEscEvent(evt)) {
+      if ((evt.target.nodeName === 'BODY') || (evt.target.matches('input[type="radio"]')) || (evt.target.matches('input[type="file"]'))) {
+        evt.preventDefault();
+        closeImageFormHandler();
+      }
     }
   };
 
   const setScale = (scaleData) => {
-    imageUploadPreview.style.transform = `scale(${scaleData / 100})`;
+    imageUpload.style.transform = `scale(${scaleData / 100})`;
     scaleTextValue.value = `${scaleData}%`;
   };
 
-  const scaleBigger = () => {
+  const scaleBiggerHandler = () => {
     if (imageScaleValue < 100) {
       imageScaleValue += 25;
       setScale(imageScaleValue);
     }
   };
 
-  const scaleSmaller = () => {
+  const scaleSmallerHandler = () => {
     if (imageScaleValue > 25) {
       imageScaleValue -= 25;
       setScale(imageScaleValue);
@@ -130,18 +135,19 @@ const initImageUploader = () => {
     });
   };
 
-  function closeImageForm() {
+  function closeImageFormHandler() {
     imageScaleValue = 100;
-    formCancelButton.removeEventListener('click', closeImageForm);
-    document.removeEventListener('keydown', escEvent);
+    formCancelButton.removeEventListener('click', closeImageFormHandler);
+    document.removeEventListener('keydown', escEventHandler);
     fileChooser.value = '';
     imageUploadForm.reset();
     effectsValue.value = '';
     hashtagsTextInput.value = '';
     commentsTextInput.value = '';
-    imageUploadPreview.classList.remove('scale');
-    scaleSmallerButton.removeEventListener('click', scaleSmaller);
-    scaleBiggerButton.removeEventListener('click', scaleBigger);
+    selectedEffect = '';
+    imageUpload.classList.remove('scale');
+    scaleSmallerButton.removeEventListener('click', scaleSmallerHandler);
+    scaleBiggerButton.removeEventListener('click', scaleBiggerHandler);
     effectsSlider.noUiSlider.destroy();
     clearFilter();
     formUploadToggle();
@@ -167,14 +173,17 @@ const initImageUploader = () => {
           const reader = new FileReader();
           reader.addEventListener('load', () => {
             if (imageUpload) {
-              imageUpload.src = reader.result;
-              imageStyle.forEach((it) => (it.style.backgroundImage = `url(${reader.result})`));
-              imageUploadPreview.classList.add('scale');
-              imageUploadPreview.style.transform = `scale(${imageScaleValue / 100})`;
+              const imageBase64 = reader.result;
+              imageUpload.src = imageBase64;
+              imageStyle.forEach((it) => {
+                it.style.backgroundImage = `url(${imageBase64})`;
+              });
+              imageUpload.classList.add('scale');
+              imageUpload.style.transform = `scale(${imageScaleValue / 100})`;
               formUploadToggle();
               scaleTextValue.value = `${imageScaleValue}%`;
-              formCancelButton.addEventListener('click', closeImageForm);
-              document.addEventListener('keydown', escEvent);
+              formCancelButton.addEventListener('click', closeImageFormHandler);
+              document.addEventListener('keydown', escEventHandler);
               effectsForm.classList.add('hidden');
 
               noUiSlider.create(effectsSlider, {
@@ -198,8 +207,8 @@ const initImageUploader = () => {
                 },
               });
 
-              scaleSmallerButton.addEventListener('click', scaleSmaller);
-              scaleBiggerButton.addEventListener('click', scaleBigger);
+              scaleSmallerButton.addEventListener('click', scaleSmallerHandler);
+              scaleBiggerButton.addEventListener('click', scaleBiggerHandler);
             }
           });
           reader.readAsDataURL(file);
@@ -208,7 +217,6 @@ const initImageUploader = () => {
     });
   }
 
-  let selectedEffect = '';
   effectsButtons.addEventListener('click', (evt) => {
     const clickedEffect = evt.target.value;
     if (evt.target.matches('input[type="radio"]') && clickedEffect !== selectedEffect) {
@@ -252,9 +260,9 @@ const initImageUploader = () => {
   });
 
   hashtagsTextInput.addEventListener('input', () => {
-    const hashtagsAll = hashtagsTextInput.value.split(' ').filter((text) => text);
-    if (hashtagsAll.length > 5) {
-      hashtagsTextInput.setCustomValidity('5 хэштэгов максимум');
+    const hashtagsAll = hashtagsTextInput.value.toLowerCase().split(' ').filter((text) => text);
+    if (hashtagsAll.length > MAX_HASHTAGS_COUNT) {
+      hashtagsTextInput.setCustomValidity(`Максимум хэштегов: ${MAX_HASHTAGS_COUNT}`);
       hashtagsTextInput.reportValidity();
     } else {
       const hasNotTag = hashtagsAll.some((tag) => !hashtagsPattern.test(tag));
@@ -272,20 +280,24 @@ const initImageUploader = () => {
     }
   });
 
-  const closeFormMessageHanlder = (evt) => {
-    if (isEscEvent(evt)) {
+  const closeFormMessageEscEventHanlder = (evt) => {
+    if (checkEscEvent(evt)) {
       evt.preventDefault();
-      removeFormMessage();
-    } else if (evt.target === document.body.lastElementChild) {
-      evt.preventDefault();
-      removeFormMessage();
+      removeFormMessageHandler();
     }
   };
 
-  function removeFormMessage() {
+  const closeFormMessageClickHanlder = (evt) => {
+    if (evt.target === document.body.lastElementChild) {
+      evt.preventDefault();
+      removeFormMessageHandler();
+    }
+  };
+
+  function removeFormMessageHandler() {
     document.body.lastElementChild.remove();
-    document.removeEventListener('keydown', closeFormMessageHanlder);
-    document.removeEventListener('click', closeFormMessageHanlder);
+    document.removeEventListener('keydown', closeFormMessageEscEventHanlder);
+    document.removeEventListener('click', closeFormMessageClickHanlder);
   }
 
   const showSuccessPopup = () => {
@@ -293,18 +305,18 @@ const initImageUploader = () => {
     const successPopupBlock = successTemplate.cloneNode(true);
     document.body.append(successPopupBlock);
     const successButton = document.querySelector('.success__button');
-    successButton.addEventListener('click', removeFormMessage);
-    document.addEventListener('click', closeFormMessageHanlder);
-    document.addEventListener('keydown', closeFormMessageHanlder);
+    successButton.addEventListener('click', removeFormMessageHandler);
+    document.addEventListener('click', closeFormMessageClickHanlder);
+    document.addEventListener('keydown', closeFormMessageEscEventHanlder);
   };
 
   const showErrorPopup = () => {
     document.body.lastElementChild.remove();
     document.body.append(errorTemplate.cloneNode(true));
     const errorButton = document.querySelector('.error__button');
-    errorButton.addEventListener('click', removeFormMessage);
-    document.addEventListener('click', closeFormMessageHanlder);
-    document.addEventListener('keydown', closeFormMessageHanlder);
+    errorButton.addEventListener('click', removeFormMessageHandler);
+    document.addEventListener('click', closeFormMessageClickHanlder);
+    document.addEventListener('keydown', closeFormMessageEscEventHanlder);
   };
 
   if (imageUploadForm) {
@@ -316,7 +328,7 @@ const initImageUploader = () => {
         () => showErrorPopup(),
         new FormData(evt.target),
       );
-      closeImageForm();
+      closeImageFormHandler();
     });
   }
 };

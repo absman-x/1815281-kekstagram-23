@@ -1,5 +1,5 @@
 import {picturesFilterHandler} from './similar-pictures.js';
-import {addOpenHandler} from './bigpicture-viewer.js';
+import {addOpenHandler} from './big-picture-viewer.js';
 import {initImageUploader} from './image-uploader.js';
 import {getData} from './server-api.js';
 

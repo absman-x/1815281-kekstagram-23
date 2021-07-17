@@ -1,5 +1,6 @@
 const picturesContainer = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture').content;
+const picturesContainerFragment = document.createDocumentFragment();
 
 const createPicturePreview = (picturePreview) => {
   const picture = pictureTemplate.cloneNode(true);
@@ -16,8 +17,9 @@ const createPicturePreview = (picturePreview) => {
 
 const renderPicturePreviews = (picturePreviews) => {
   for (const picturePreview of picturePreviews) {
-    picturesContainer.appendChild(createPicturePreview(picturePreview));
+    picturesContainerFragment.appendChild(createPicturePreview(picturePreview));
   }
+  picturesContainer.appendChild(picturesContainerFragment);
 };
 
 export {renderPicturePreviews};

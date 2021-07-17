@@ -17,7 +17,7 @@ const filtersButtons = filtersForm.querySelectorAll('.img-filters__button');
 
 filterSection.classList.remove('img-filters--inactive');
 
-const picturesRemover = () => {
+const removePictures = () => {
   const picturesRendered = document.querySelectorAll('.picture');
   picturesRendered.forEach((picture) => picture.remove());
 };
@@ -34,7 +34,7 @@ const getRandomUniqueItems = (items, count) => {
 };
 
 const clearFilter = () => {
-  picturesRemover();
+  removePictures();
   for (const button of filtersButtons) {
     button.classList.remove('img-filters__button--active');
   }
@@ -42,28 +42,28 @@ const clearFilter = () => {
 
 const picturesFilterHandler = (pictures) => {
   renderPicturePreviews(pictures);
-  const discussedPicture = pictures.slice(0);
-  discussedPicture.sort((element1, element2) => element2.comments.length - element1.comments.length);
+  const discussedPictures = pictures.slice(0);
+  discussedPictures.sort((element1, element2) => element2.comments.length - element1.comments.length);
 
-  const defaultPicturesFilter = debounce(() => {
+  const defaultPicturesFilter = () => {
     clearFilter();
     defaultPicturesFilterButton.classList.add('img-filters__button--active');
     renderPicturePreviews(pictures);
-  }, RERENDER_DELAY);
+  };
 
-  const randomPicturesFilter = debounce(() => {
+  const randomPicturesFilter = () => {
     clearFilter();
     renderPicturePreviews(getRandomUniqueItems(pictures, RANDOM_PICTURES_COUNT));
     randomPicturesFilterButton.classList.add('img-filters__button--active');
-  }, RERENDER_DELAY);
+  };
 
-  const disscusedPicturesFilter = debounce(() => {
+  const disscusedPicturesFilter = () => {
     clearFilter();
-    renderPicturePreviews(discussedPicture);
+    renderPicturePreviews(discussedPictures);
     disscusedPicturesFilterButton.classList.add('img-filters__button--active');
-  }, RERENDER_DELAY);
+  };
 
-  filterSection.addEventListener('click', (evt) => {
+  filterSection.addEventListener('click', debounce((evt) => {
     const clickedFilter = evt.target.id;
     if (evt.target.matches('button[type="button"]')) {
       switch (clickedFilter) {
@@ -78,7 +78,7 @@ const picturesFilterHandler = (pictures) => {
           break;
       }
     }
-  });
+  }, RERENDER_DELAY));
 };
 
 export {picturesFilterHandler};
