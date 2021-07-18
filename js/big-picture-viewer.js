@@ -38,7 +38,7 @@ const renderComment = (comment) => {
 };
 
 const renderBigPicturePreview = (picture) => {
-  const escEvent = (evt) => {
+  const escEventHandler = (evt) => {
     if (checkEscEvent(evt)) {
       evt.preventDefault();
       closeBigPicturePopupHandler();
@@ -67,11 +67,11 @@ const renderBigPicturePreview = (picture) => {
   bigPictureCommentsLoader.addEventListener('click', renderCommentsBlockHandler);
   bigPictureCommentsLoader.dispatchEvent(new Event('click'));
   bigPictureToggle();
-  document.addEventListener('keydown', escEvent);
+  document.addEventListener('keydown', escEventHandler);
   bigPictureCloseElement.addEventListener('click', closeBigPicturePopupHandler);
 
   function closeBigPicturePopupHandler() {
-    document.removeEventListener('keydown', escEvent);
+    document.removeEventListener('keydown', escEventHandler);
     bigPictureCloseElement.removeEventListener('click', closeBigPicturePopupHandler);
     bigPictureCommentsLoader.removeEventListener('click', renderCommentsBlockHandler);
     commentsBlock.innerHTML = '';

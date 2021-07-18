@@ -4,6 +4,9 @@ import {sendData} from './server-api.js';
 const FILE_TYPES = ['.gif', '.jpg', '.jpeg', '.png'];
 const MAX_COMMENT_SYMBOLS = 140;
 const MAX_HASHTAGS_COUNT = 5;
+const MAX_SCALE_VALUE = 100;
+const MIN_SCALE_VALUE = 25;
+const SCALE_STEP_VALUE = 25;
 const FILTERS = {
   CHROME: 'chrome',
   SEPIA: 'sepia',
@@ -86,7 +89,7 @@ const initImageUploader = () => {
     body.classList.toggle('modal-open');
   };
 
-  let imageScaleValue = 100;
+  let imageScaleValue = MAX_SCALE_VALUE;
 
   const escEventHandler = (evt) => {
     if (checkEscEvent(evt)) {
@@ -98,20 +101,20 @@ const initImageUploader = () => {
   };
 
   const setScale = (scaleData) => {
-    imageUpload.style.transform = `scale(${scaleData / 100})`;
+    imageUpload.style.transform = `scale(${scaleData / MAX_SCALE_VALUE})`;
     scaleTextValue.value = `${scaleData}%`;
   };
 
   const scaleBiggerHandler = () => {
-    if (imageScaleValue < 100) {
-      imageScaleValue += 25;
+    if (imageScaleValue < MAX_SCALE_VALUE) {
+      imageScaleValue += SCALE_STEP_VALUE;
       setScale(imageScaleValue);
     }
   };
 
   const scaleSmallerHandler = () => {
-    if (imageScaleValue > 25) {
-      imageScaleValue -= 25;
+    if (imageScaleValue > MIN_SCALE_VALUE) {
+      imageScaleValue -= SCALE_STEP_VALUE;
       setScale(imageScaleValue);
     }
   };
@@ -136,7 +139,7 @@ const initImageUploader = () => {
   };
 
   function closeImageFormHandler() {
-    imageScaleValue = 100;
+    imageScaleValue = MAX_SCALE_VALUE;
     formCancelButton.removeEventListener('click', closeImageFormHandler);
     document.removeEventListener('keydown', escEventHandler);
     fileChooser.value = '';
@@ -179,7 +182,7 @@ const initImageUploader = () => {
                 it.style.backgroundImage = `url(${imageBase64})`;
               });
               imageUpload.classList.add('scale');
-              imageUpload.style.transform = `scale(${imageScaleValue / 100})`;
+              imageUpload.style.transform = `scale(${imageScaleValue / MAX_SCALE_VALUE})`;
               formUploadToggle();
               scaleTextValue.value = `${imageScaleValue}%`;
               formCancelButton.addEventListener('click', closeImageFormHandler);
