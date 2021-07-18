@@ -91,7 +91,7 @@ const initImageUploader = () => {
 
   let imageScaleValue = MAX_SCALE_VALUE;
 
-  const escEventHandler = (evt) => {
+  const checkEscEventHandler = (evt) => {
     if (checkEscEvent(evt)) {
       if ((evt.target.nodeName === 'BODY') || (evt.target.matches('input[type="radio"]')) || (evt.target.matches('input[type="file"]'))) {
         evt.preventDefault();
@@ -141,7 +141,7 @@ const initImageUploader = () => {
   function closeImageFormHandler() {
     imageScaleValue = MAX_SCALE_VALUE;
     formCancelButton.removeEventListener('click', closeImageFormHandler);
-    document.removeEventListener('keydown', escEventHandler);
+    document.removeEventListener('keydown', checkEscEventHandler);
     fileChooser.value = '';
     imageUploadForm.reset();
     effectsValue.value = '';
@@ -186,7 +186,7 @@ const initImageUploader = () => {
               formUploadToggle();
               scaleTextValue.value = `${imageScaleValue}%`;
               formCancelButton.addEventListener('click', closeImageFormHandler);
-              document.addEventListener('keydown', escEventHandler);
+              document.addEventListener('keydown', checkEscEventHandler);
               effectsForm.classList.add('hidden');
 
               noUiSlider.create(effectsSlider, {
